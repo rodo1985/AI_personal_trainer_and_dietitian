@@ -1,0 +1,64 @@
+.app-shell {
+  margin: 0 auto;
+  max-width: 960px;
+  padding: 2rem 1rem 3rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.hero,
+.panel {
+  background: #ffffff;
+  border: 1px solid #d6dce5;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #355f91;
+  margin-bottom: 0.5rem;
+}
+
+h1,
+h2 {
+  margin: 0;
+  color: #1e2938;
+}
+
+p {
+  margin: 0.75rem 0 0;
+  color: #2d3f53;
+  line-height: 1.5;
+}
+
+.panel ul {
+  margin: 0.85rem 0 0;
+  padding-left: 1.25rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.panel-compact p {
+  margin-top: 0.5rem;
+}
+
+code {
+  background: #edf2f8;
+  border-radius: 4px;
+  padding: 0.1rem 0.3rem;
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    padding: 1rem;
+  }
+
+  .hero,
+  .panel {
+    padding: 1rem;
+  }
+}

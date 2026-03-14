@@ -11,12 +11,12 @@ help: ## Show repository shortcuts and current branch notes.
 	@awk 'BEGIN {FS = ":.*## "}; /^[a-zA-Z0-9_.-]+:.*## / {printf "  %-16s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@printf "\n"
 	@printf "Tip: GNU Make also supports the built-in flag \`make --help\` for CLI usage details.\n"
-	@printf "This branch is documentation-only today, so some targets print guidance until the scaffold exists.\n"
+	@printf "Backend scaffold is available; frontend targets print guidance until the React scaffold exists.\n"
 
 setup: ## Create or sync the Python environment with uv when pyproject.toml exists.
 	@if [ -f pyproject.toml ]; then \
 		uv venv; \
-		uv sync; \
+		uv sync --all-groups; \
 	else \
 		printf "%s\n" "No pyproject.toml yet. The foundation scaffold has not been added on this branch."; \
 	fi

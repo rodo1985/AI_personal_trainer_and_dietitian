@@ -1,80 +1,73 @@
 # Personal Endurance Trainer Log Prototype
 
 ## What this repo is
-This repository holds the planning artifacts for a single-user web app that combines training, nutrition, and glucose observations into one daily log.
-The target user is an endurance athlete who wants to review Strava activities, manually log meals with AI assistance, and attach Abbott Libre glucose screenshots to the same day view.
-At the moment, the repository is in the planning stage: the implementation roadmap and parallel worktree prompts are ready, but the backend and frontend scaffolds have not been created yet.
+This repository contains a single-user training log prototype that combines meals, activities, and glucose screenshots into one day view.
+The current branch now includes a runnable React + TypeScript frontend for the day-log flow, backed by mocked API adapters.
+The backend service is still planned and documented, so the UI uses local fixtures and predictable mock responses for now.
+The goal is to keep the product local-first and practical for daily logging on mobile and desktop.
 
 ## Key features / scope
-- Planned v1 combines three inputs in one day log: meals, Strava activities, and glucose screenshots.
-- Planned v1 uses AI only through OpenAI models for meal parsing, screenshot summarization, and audio transcription.
-- Planned v1 includes a day selector, meal slots for `breakfast`, `lunch`, `dinner`, and `snacks`, a draft-review flow, and a daily summary.
-- Planned Strava behavior is a rolling 7-day sync when the app opens or when the user navigates between recent days.
-- Planned storage is local-first with `SQLite` for structured data and local file storage for uploaded glucose screenshots.
-- Out of scope for v1 are multi-user auth, MyFitnessPal sync, direct Abbott/Libre API integration, realtime Strava webhooks, and medical recommendations.
+- Includes a day selector, meal sections (`breakfast`, `lunch`, `dinner`, `snacks`), activity panel, glucose panel, assistant composer, microphone trigger, and draft review flow.
+- Includes mocked draft generation and save confirmation flow with empty, loading, and save-error states.
+- Includes frontend smoke tests for the main day-log interactions.
+- Uses only mocked frontend adapters on this branch; backend persistence and live API wiring are not merged yet.
+- Keeps v1 out of scope for multi-user auth, direct Abbott/Libre APIs, MyFitnessPal sync, realtime Strava webhooks, and medical recommendations.
 
 ## Setup
-The current branch contains planning documentation only, so there is no runnable application scaffold yet.
-The first implementation branch, `codex/foundation`, is responsible for creating the initial `uv`-managed Python project, the FastAPI shell, and the React shell described in the plan.
+Prerequisites:
+- Python 3.11+
+- [`uv`](https://docs.astral.sh/uv/) for backend environment management
+- Node.js 20+ and npm
 
-A root `Makefile` is included now so contributors have one predictable entry point for common workflows. On this planning branch, the targets print guidance until the backend and frontend scaffolds exist.
-
-```bash
-make help
-```
-
-When the foundation branch lands, local setup should follow this flow:
+Backend `uv` workflow (for the planned FastAPI scaffold):
 
 ```bash
 make setup
+# Equivalent uv commands once pyproject.toml exists:
 uv venv
 uv sync
 ```
 
-Then install the frontend dependencies from the React app directory that the foundation branch introduces:
+Frontend setup (available now):
 
 ```bash
 make frontend-install
-npm install
+# or
+npm --prefix frontend install
 ```
-
-Reference documents:
-- [Implementation plan](/Users/REDONSX1/Documents/code/01 personal/AI_personal_trainer_and_dietitian/docs/implementation-plan.md)
-- [Parallel worktree prompts](/Users/REDONSX1/Documents/code/01 personal/AI_personal_trainer_and_dietitian/docs/parallel-worktree-prompts.md)
 
 ## How to run
-This branch does not yet contain runnable backend or frontend code.
-The target commands, once Phase 1 is scaffolded, are:
+Frontend development server:
 
 ```bash
-# Backend development server
-make backend-dev
-uv run fastapi dev backend/app/main.py
-
-# Frontend development server
 make frontend-dev
-npm run dev
-
-# Combined tests
-make test
-uv run pytest
-
-# Frontend tests
-npm test
-
-# Python lint
-make lint
-uv run ruff check .
-
-# Frontend production build
-make build
-npm run build
+# or
+npm --prefix frontend run dev
 ```
 
-These commands are intentionally documented now so that the implementation branches can converge on one expected developer workflow. The `Makefile` should stay aligned with the real commands as the scaffold lands.
+Frontend tests:
+
+```bash
+npm --prefix frontend test
+```
+
+Frontend production build:
+
+```bash
+make build
+# or
+npm --prefix frontend run build
+```
+
+Combined target (runs frontend tests and skips backend tests until backend scaffold exists):
+
+```bash
+make test
+```
 
 ## Configuration
-The planned environment variables for the first prototype are:
+No environment variables are required for the current mocked frontend flow.
+Planned backend configuration variables remain:
 
 - `OPENAI_API_KEY`
 - `OPENAI_MEAL_MODEL`
@@ -86,25 +79,18 @@ The planned environment variables for the first prototype are:
 - `DATABASE_URL`
 - `UPLOAD_DIR`
 
-The repository should keep secrets in local environment files that are not committed, and the final scaffold should document exact examples in a `.env.example` file.
+When backend scaffolding lands, add a `.env.example` with concrete local values and keep secrets out of version control.
 
 ## Project structure
-The intended structure after the foundation branch lands is:
-
-- `backend/`: FastAPI application, persistence layer, integrations, and tests.
-- `frontend/`: React application for day logs, assistant drafting, and review flows.
-- `docs/`: implementation planning, integration notes, and contributor guidance.
-- `uploads/`: local development storage for glucose screenshots.
-- `data/`: local SQLite database files for development, if the final scaffold keeps them in-repo.
-
-Today, only `docs/` planning artifacts are present.
+- `frontend/`: React + TypeScript day-log UI, mocked adapters, styles, and frontend tests.
+- `docs/implementation-plan.md`: shared product/architecture plan.
+- `docs/parallel-worktree-prompts.md`: branch ownership prompts for parallel execution.
+- `docs/frontend-day-log-assumptions.md`: mocked API contract and integration handoff notes for backend wiring.
+- `Makefile`: common commands for setup, run, test, and build.
 
 ## Contributing / Development notes
-Start from the saved implementation plan before creating code:
-- [Implementation plan](/Users/REDONSX1/Documents/code/01 personal/AI_personal_trainer_and_dietitian/docs/implementation-plan.md)
-- [Parallel worktree prompts](/Users/REDONSX1/Documents/code/01 personal/AI_personal_trainer_and_dietitian/docs/parallel-worktree-prompts.md)
-
-The parallel worktree strategy is designed to reduce merge conflicts:
-- `codex/foundation` owns the initial scaffold and shared contracts.
-- Feature worktrees should stay within their assigned scope and avoid rewriting shared setup unless required.
-- Any change that affects setup, configuration, or developer workflow must also update this `README.md`.
+- Start from the plan docs before implementation changes:
+  - `docs/implementation-plan.md`
+  - `docs/parallel-worktree-prompts.md`
+- Keep frontend/backend contracts aligned with `docs/frontend-day-log-assumptions.md` when replacing mocks.
+- If you change setup, commands, behavior, or config assumptions, update this README in the same PR.

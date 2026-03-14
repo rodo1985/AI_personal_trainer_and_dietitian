@@ -11,7 +11,7 @@ help: ## Show repository shortcuts and current branch notes.
 	@awk 'BEGIN {FS = ":.*## "}; /^[a-zA-Z0-9_.-]+:.*## / {printf "  %-16s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@printf "\n"
 	@printf "Tip: GNU Make also supports the built-in flag \`make --help\` for CLI usage details.\n"
-	@printf "This branch is documentation-only today, so some targets print guidance until the scaffold exists.\n"
+	@printf "Frontend day-log scaffolding is available; backend targets still print guidance until backend files exist.\n"
 
 setup: ## Create or sync the Python environment with uv when pyproject.toml exists.
 	@if [ -f pyproject.toml ]; then \

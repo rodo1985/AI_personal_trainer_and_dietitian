@@ -1,10 +1,10 @@
 # Parallel Worktree Agent Prompts
 
 Use these prompts as copy-paste starting points for parallel Codex worktrees.
-Each prompt references the shared plan at [docs/implementation-plan.md](/Users/REDONSX1/Documents/code/01 personal/AI_personal_trainer_and_dietitian/docs/implementation-plan.md) so all branches work from the same assumptions.
+Each prompt references the shared plan at [docs/implementation-plan.md](./implementation-plan.md) so all branches work from the same assumptions.
 
 ## Shared instructions for every agent
-- Read [docs/implementation-plan.md](/Users/REDONSX1/Documents/code/01 personal/AI_personal_trainer_and_dietitian/docs/implementation-plan.md) before making changes.
+- Read [docs/implementation-plan.md](./implementation-plan.md) before making changes.
 - Keep the project single-user and local-first for v1.
 - Use only OpenAI models for AI features.
 - Do not add multi-user auth, direct Abbott/Libre API integration, MyFitnessPal sync, realtime Strava webhooks, or medical recommendations.

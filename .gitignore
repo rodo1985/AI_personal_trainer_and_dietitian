@@ -212,7 +212,9 @@ data/*
 uploads/*
 !uploads/.gitkeep
 
-# Frontend build and dependency artifacts
+# Frontend (React/Vite)
 frontend/node_modules/
 frontend/dist/
+frontend/.vite/
+frontend/coverage/
 frontend/*.tsbuildinfo

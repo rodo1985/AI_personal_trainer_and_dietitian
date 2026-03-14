@@ -1,80 +1,97 @@
 # Personal Endurance Trainer Log Prototype
 
 ## What this repo is
-This repository holds the planning artifacts for a single-user web app that combines training, nutrition, and glucose observations into one daily log.
-The target user is an endurance athlete who wants to review Strava activities, manually log meals with AI assistance, and attach Abbott Libre glucose screenshots to the same day view.
-At the moment, the repository is in the planning stage: the implementation roadmap and parallel worktree prompts are ready, but the backend and frontend scaffolds have not been created yet.
+This repository is a single-user, local-first prototype for tracking endurance training, meals, and glucose observations in one daily log.
+This branch now includes a runnable FastAPI backend slice for Strava OAuth and rolling activity sync.
+The frontend and AI meal/glucose pipelines are still planned and documented, but not implemented on this worktree yet.
 
 ## Key features / scope
-- Planned v1 combines three inputs in one day log: meals, Strava activities, and glucose screenshots.
-- Planned v1 uses AI only through OpenAI models for meal parsing, screenshot summarization, and audio transcription.
-- Planned v1 includes a day selector, meal slots for `breakfast`, `lunch`, `dinner`, and `snacks`, a draft-review flow, and a daily summary.
-- Planned Strava behavior is a rolling 7-day sync when the app opens or when the user navigates between recent days.
-- Planned storage is local-first with `SQLite` for structured data and local file storage for uploaded glucose screenshots.
-- Out of scope for v1 are multi-user auth, MyFitnessPal sync, direct Abbott/Libre API integration, realtime Strava webhooks, and medical recommendations.
+- Implemented in this branch:
+  - FastAPI backend app scaffold with health and Strava routes
+  - Strava OAuth connect/callback flow
+  - Encrypted token storage in SQLite
+  - Rolling 7-day Strava sync with idempotent upsert by `strava_activity_id`
+  - Optional manual `rpe_override` updates per activity
+  - Backend tests for OAuth, refresh, sync window filtering, and duplicate prevention
+- Planned (not yet implemented here):
+  - Day-log aggregate API
+  - AI-assisted meal parsing and save flow
+  - Glucose screenshot upload and summarization
+  - React day-log UI
+- Out of scope for v1:
+  - Multi-user auth
+  - Direct Abbott/Libre API integration
+  - MyFitnessPal sync
+  - Realtime Strava webhooks
+  - Medical recommendations
 
 ## Setup
-The current branch contains planning documentation only, so there is no runnable application scaffold yet.
-The first implementation branch, `codex/foundation`, is responsible for creating the initial `uv`-managed Python project, the FastAPI shell, and the React shell described in the plan.
-
-A root `Makefile` is included now so contributors have one predictable entry point for common workflows. On this planning branch, the targets print guidance until the backend and frontend scaffolds exist.
-
-```bash
-make help
-```
-
-When the foundation branch lands, local setup should follow this flow:
+1. Install `uv` (see [uv docs](https://docs.astral.sh/uv/getting-started/installation/)).
+2. Create and sync the Python environment:
 
 ```bash
 make setup
+# equivalent explicit commands:
 uv venv
 uv sync
 ```
 
-Then install the frontend dependencies from the React app directory that the foundation branch introduces:
+3. Create local environment config:
 
 ```bash
-make frontend-install
-npm install
+cp .env.example .env
 ```
 
-Reference documents:
-- [Implementation plan](/Users/REDONSX1/Documents/code/01 personal/AI_personal_trainer_and_dietitian/docs/implementation-plan.md)
-- [Parallel worktree prompts](/Users/REDONSX1/Documents/code/01 personal/AI_personal_trainer_and_dietitian/docs/parallel-worktree-prompts.md)
+4. Fill `.env` values, especially Strava credentials:
+- `STRAVA_CLIENT_ID`
+- `STRAVA_CLIENT_SECRET`
+- `STRAVA_REDIRECT_URI` (default local callback: `http://localhost:8000/api/strava/callback`)
+- `STRAVA_TOKEN_ENCRYPTION_KEY` (recommended)
+- `DATABASE_URL`
+
+Frontend setup is documented for future branches, but no `frontend/` app exists on this worktree yet.
 
 ## How to run
-This branch does not yet contain runnable backend or frontend code.
-The target commands, once Phase 1 is scaffolded, are:
+Backend dev server:
 
 ```bash
-# Backend development server
 make backend-dev
+# equivalent:
 uv run fastapi dev backend/app/main.py
-
-# Frontend development server
-make frontend-dev
-npm run dev
-
-# Combined tests
-make test
-uv run pytest
-
-# Frontend tests
-npm test
-
-# Python lint
-make lint
-uv run ruff check .
-
-# Frontend production build
-make build
-npm run build
 ```
 
-These commands are intentionally documented now so that the implementation branches can converge on one expected developer workflow. The `Makefile` should stay aligned with the real commands as the scaffold lands.
+Backend tests:
+
+```bash
+make test
+# equivalent:
+uv run pytest
+```
+
+Backend lint:
+
+```bash
+make lint
+# equivalent:
+uv run ruff check .
+```
+
+Strava OAuth + sync flow (example):
+
+```bash
+# 1) Start backend
+uv run fastapi dev backend/app/main.py
+
+# 2) Request connect URL
+curl "http://localhost:8000/api/strava/connect"
+
+# 3) Complete Strava authorization in browser using returned URL
+# 4) Trigger rolling sync
+curl -X POST "http://localhost:8000/api/strava/sync/recent"
+```
 
 ## Configuration
-The planned environment variables for the first prototype are:
+Environment variables used now or reserved by planned features:
 
 - `OPENAI_API_KEY`
 - `OPENAI_MEAL_MODEL`
@@ -83,28 +100,34 @@ The planned environment variables for the first prototype are:
 - `STRAVA_CLIENT_ID`
 - `STRAVA_CLIENT_SECRET`
 - `STRAVA_REDIRECT_URI`
+- `STRAVA_SCOPES`
+- `STRAVA_SYNC_DAYS` (defaults to `7`)
+- `STRAVA_ACTIVITY_PAGE_SIZE`
+- `STRAVA_TOKEN_ENCRYPTION_KEY` (recommended)
 - `DATABASE_URL`
 - `UPLOAD_DIR`
 
-The repository should keep secrets in local environment files that are not committed, and the final scaffold should document exact examples in a `.env.example` file.
+Use `.env.example` as the template. Keep real secrets in `.env`, which should stay uncommitted.
 
 ## Project structure
-The intended structure after the foundation branch lands is:
-
-- `backend/`: FastAPI application, persistence layer, integrations, and tests.
-- `frontend/`: React application for day logs, assistant drafting, and review flows.
-- `docs/`: implementation planning, integration notes, and contributor guidance.
-- `uploads/`: local development storage for glucose screenshots.
-- `data/`: local SQLite database files for development, if the final scaffold keeps them in-repo.
-
-Today, only `docs/` planning artifacts are present.
+- `backend/app/main.py`: FastAPI application entrypoint.
+- `backend/app/routers/strava.py`: Strava connect/callback/sync/override routes.
+- `backend/app/services/`: Strava client, sync orchestration, and token crypto helpers.
+- `backend/app/repositories/strava_repository.py`: SQLite persistence for tokens, activities, and sync metadata.
+- `backend/tests/`: Route and service tests for Strava integration behavior.
+- `docs/implementation-plan.md`: Shared product and architecture plan.
+- `docs/parallel-worktree-prompts.md`: Parallel branch ownership prompts.
+- `docs/integrations/strava-sync.md`: Strava setup, usage, and caveats.
+- `data/`: Local SQLite data directory (created at runtime).
 
 ## Contributing / Development notes
-Start from the saved implementation plan before creating code:
-- [Implementation plan](/Users/REDONSX1/Documents/code/01 personal/AI_personal_trainer_and_dietitian/docs/implementation-plan.md)
-- [Parallel worktree prompts](/Users/REDONSX1/Documents/code/01 personal/AI_personal_trainer_and_dietitian/docs/parallel-worktree-prompts.md)
+- Read [implementation plan](/Users/REDONSX1/.codex/worktrees/de69/AI_personal_trainer_and_dietitian/docs/implementation-plan.md) before major changes.
+- Keep implementation local-first and single-user for v1.
+- For this branch, stay focused on Strava integration scope and avoid unrelated meal/upload/frontend rewrites.
+- Update `README.md` and `docs/` whenever setup, behavior, or configuration changes.
+- Run tests and lint locally before finalizing:
 
-The parallel worktree strategy is designed to reduce merge conflicts:
-- `codex/foundation` owns the initial scaffold and shared contracts.
-- Feature worktrees should stay within their assigned scope and avoid rewriting shared setup unless required.
-- Any change that affects setup, configuration, or developer workflow must also update this `README.md`.
+```bash
+uv run pytest
+uv run ruff check .
+```

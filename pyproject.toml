@@ -1,0 +1,32 @@
+[project]
+name = "personal-endurance-trainer-log"
+version = "0.1.0"
+description = "Single-user local-first endurance day log prototype"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi[standard]>=0.115.6",
+  "httpx>=0.28.1",
+  "openai>=1.65.5",
+  "pydantic-settings>=2.8.1",
+  "python-multipart>=0.0.20",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3.5",
+  "pytest-cov>=6.0.0",
+  "ruff>=0.9.7",
+]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+pythonpath = ["."]
+testpaths = ["backend/tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

@@ -1,110 +1,121 @@
 # Personal Endurance Trainer Log Prototype
 
 ## What this repo is
-This repository holds the planning artifacts for a single-user web app that combines training, nutrition, and glucose observations into one daily log.
-The target user is an endurance athlete who wants to review Strava activities, manually log meals with AI assistance, and attach Abbott Libre glucose screenshots to the same day view.
-At the moment, the repository is in the planning stage: the implementation roadmap and parallel worktree prompts are ready, but the backend and frontend scaffolds have not been created yet.
+This repository contains a single-user, local-first prototype that combines meals, recent Strava activity, and glucose screenshots into one day-based log.
+It ships with a FastAPI backend, a React + TypeScript frontend, SQLite persistence, and local upload storage.
+The goal is practical daily tracking with AI-assisted draft workflows and explicit user confirmation before saving uncertain data.
 
 ## Key features / scope
-- Planned v1 combines three inputs in one day log: meals, Strava activities, and glucose screenshots.
-- Planned v1 uses AI only through OpenAI models for meal parsing, screenshot summarization, and audio transcription.
-- Planned v1 includes a day selector, meal slots for `breakfast`, `lunch`, `dinner`, and `snacks`, a draft-review flow, and a daily summary.
-- Planned Strava behavior is a rolling 7-day sync when the app opens or when the user navigates between recent days.
-- Planned storage is local-first with `SQLite` for structured data and local file storage for uploaded glucose screenshots.
-- Out of scope for v1 are multi-user auth, MyFitnessPal sync, direct Abbott/Libre API integration, realtime Strava webhooks, and medical recommendations.
+- Unified day view for meals, activities, glucose uploads, and nutrition totals.
+- Assistant meal draft endpoint plus frontend review-and-save flow.
+- Meal edit flow so users can recover from bad drafts without dead ends.
+- Rolling 7-day activity sync endpoint with idempotent upsert behavior.
+- Current integration-hardening build uses deterministic local activity payloads for sync while preserving the final Strava API contract.
+- Glucose screenshot upload with descriptive (non-medical) summary text.
+- Frontend loading, empty, and error states with explicit retry actions.
+- Out of scope for v1: multi-user auth, MyFitnessPal sync, direct Abbott/Libre API integration, realtime Strava webhooks, and medical recommendations.
 
 ## Setup
-The current branch contains planning documentation only, so there is no runnable application scaffold yet.
-The first implementation branch, `codex/foundation`, is responsible for creating the initial `uv`-managed Python project, the FastAPI shell, and the React shell described in the plan.
+### 1) Install prerequisites
+- Python 3.11+
+- Node.js 20+
+- [`uv`](https://docs.astral.sh/uv/getting-started/installation/)
 
-A root `Makefile` is included now so contributors have one predictable entry point for common workflows. On this planning branch, the targets print guidance until the backend and frontend scaffolds exist.
-
+### 2) Clone and enter the repository
 ```bash
-make help
+git clone <your-repo-url>
+cd AI_personal_trainer_and_dietitian
 ```
 
-When the foundation branch lands, local setup should follow this flow:
-
+### 3) Backend environment with `uv`
 ```bash
 make setup
-uv venv
-uv sync
+# Equivalent manual commands:
+# uv venv
+# uv sync --group dev
 ```
 
-Then install the frontend dependencies from the React app directory that the foundation branch introduces:
-
+### 4) Frontend dependencies
 ```bash
 make frontend-install
-npm install
+# Equivalent manual command:
+# npm --prefix frontend install
 ```
 
-Reference documents:
-- [Implementation plan](/Users/REDONSX1/Documents/code/01 personal/AI_personal_trainer_and_dietitian/docs/implementation-plan.md)
-- [Parallel worktree prompts](/Users/REDONSX1/Documents/code/01 personal/AI_personal_trainer_and_dietitian/docs/parallel-worktree-prompts.md)
+### 5) Environment variables
+```bash
+cp .env.example .env
+```
+Fill in values as needed. The app can run locally with default values for most fields.
 
 ## How to run
-This branch does not yet contain runnable backend or frontend code.
-The target commands, once Phase 1 is scaffolded, are:
-
+### Development servers
 ```bash
-# Backend development server
+# Terminal 1: backend
 make backend-dev
-uv run fastapi dev backend/app/main.py
+# uv run fastapi dev backend/app/main.py
 
-# Frontend development server
+# Terminal 2: frontend
 make frontend-dev
-npm run dev
-
-# Combined tests
-make test
-uv run pytest
-
-# Frontend tests
-npm test
-
-# Python lint
-make lint
-uv run ruff check .
-
-# Frontend production build
-make build
-npm run build
+# npm --prefix frontend run dev
 ```
 
-These commands are intentionally documented now so that the implementation branches can converge on one expected developer workflow. The `Makefile` should stay aligned with the real commands as the scaffold lands.
+### Tests
+```bash
+# All tests
+make test
+
+# Backend only
+make test-backend
+# uv run pytest
+
+# Frontend only
+make test-frontend
+# npm --prefix frontend test
+```
+
+### Lint and build
+```bash
+make lint
+# uv run ruff check .
+
+make build
+# npm --prefix frontend run build
+```
 
 ## Configuration
-The planned environment variables for the first prototype are:
+Environment variables used by the prototype:
 
-- `OPENAI_API_KEY`
-- `OPENAI_MEAL_MODEL`
-- `OPENAI_TRANSCRIBE_MODEL`
-- `OPENAI_VISION_MODEL`
-- `STRAVA_CLIENT_ID`
-- `STRAVA_CLIENT_SECRET`
-- `STRAVA_REDIRECT_URI`
-- `DATABASE_URL`
-- `UPLOAD_DIR`
+- `OPENAI_API_KEY`: OpenAI API key (reserved for direct model integration).
+- `OPENAI_MEAL_MODEL`: Model ID for meal parsing tasks.
+- `OPENAI_TRANSCRIBE_MODEL`: Model ID for audio transcription tasks.
+- `OPENAI_VISION_MODEL`: Model ID for glucose screenshot interpretation.
+- `STRAVA_CLIENT_ID`: Strava OAuth client ID.
+- `STRAVA_CLIENT_SECRET`: Strava OAuth client secret.
+- `STRAVA_REDIRECT_URI`: Strava OAuth callback URL.
+- `DATABASE_URL`: SQLite URL (default: `sqlite:///./data/app.db`).
+- `UPLOAD_DIR`: Local folder for glucose screenshot files.
+- `FRONTEND_ORIGIN`: Allowed frontend origin for backend CORS.
+- `VITE_API_BASE_URL`: Frontend API base URL.
 
-The repository should keep secrets in local environment files that are not committed, and the final scaffold should document exact examples in a `.env.example` file.
+See [`.env.example`](/Users/REDONSX1/.codex/worktrees/b446/AI_personal_trainer_and_dietitian/.env.example) for a copy/paste baseline.
 
 ## Project structure
-The intended structure after the foundation branch lands is:
-
-- `backend/`: FastAPI application, persistence layer, integrations, and tests.
-- `frontend/`: React application for day logs, assistant drafting, and review flows.
-- `docs/`: implementation planning, integration notes, and contributor guidance.
-- `uploads/`: local development storage for glucose screenshots.
-- `data/`: local SQLite database files for development, if the final scaffold keeps them in-repo.
-
-Today, only `docs/` planning artifacts are present.
+- [`backend/app/main.py`](/Users/REDONSX1/.codex/worktrees/b446/AI_personal_trainer_and_dietitian/backend/app/main.py): FastAPI app entrypoint and middleware.
+- [`backend/app/api/routes.py`](/Users/REDONSX1/.codex/worktrees/b446/AI_personal_trainer_and_dietitian/backend/app/api/routes.py): API routes for day logs, meals, uploads, and sync.
+- `backend/app/services/`: Service layer for draft parsing, persistence orchestration, upload handling, and sync behavior.
+- `backend/tests/`: Backend integration tests.
+- [`frontend/src/App.tsx`](/Users/REDONSX1/.codex/worktrees/b446/AI_personal_trainer_and_dietitian/frontend/src/App.tsx): Main React day-log UI wired to live APIs.
+- `frontend/src/api/`: Frontend API client wrappers.
+- `frontend/src/test/`: Frontend test setup files.
+- `docs/`: Implementation plan, worktree prompts, and hardening handoff notes.
+- `data/`: Local SQLite database path (created at runtime).
+- `uploads/`: Local glucose screenshot storage (created at runtime).
 
 ## Contributing / Development notes
-Start from the saved implementation plan before creating code:
-- [Implementation plan](/Users/REDONSX1/Documents/code/01 personal/AI_personal_trainer_and_dietitian/docs/implementation-plan.md)
-- [Parallel worktree prompts](/Users/REDONSX1/Documents/code/01 personal/AI_personal_trainer_and_dietitian/docs/parallel-worktree-prompts.md)
-
-The parallel worktree strategy is designed to reduce merge conflicts:
-- `codex/foundation` owns the initial scaffold and shared contracts.
-- Feature worktrees should stay within their assigned scope and avoid rewriting shared setup unless required.
-- Any change that affects setup, configuration, or developer workflow must also update this `README.md`.
+- Read [implementation plan](/Users/REDONSX1/.codex/worktrees/b446/AI_personal_trainer_and_dietitian/docs/implementation-plan.md) and [parallel prompts](/Users/REDONSX1/.codex/worktrees/b446/AI_personal_trainer_and_dietitian/docs/parallel-worktree-prompts.md) before broad changes.
+- Keep v1 single-user and local-first.
+- Preserve non-medical wording for glucose interpretation and summaries.
+- If you change API contracts, update both backend and frontend together and document the reason.
+- Keep `README.md`, `.env.example`, `Makefile`, and real commands aligned in the same change.
+- See [integration hardening notes](/Users/REDONSX1/.codex/worktrees/b446/AI_personal_trainer_and_dietitian/docs/integration-hardening.md) for deferred items.

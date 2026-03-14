@@ -1,0 +1,169 @@
+:root {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #1b2632;
+  background-color: #f3f6f8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f3f6f8 0%, #e7edf2 100%);
+}
+
+.app-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.page-header {
+  margin-bottom: 1rem;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 1.9rem;
+}
+
+.page-header p {
+  margin: 0.4rem 0 0;
+  color: #3d4d5f;
+}
+
+.grid-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.panel {
+  background: #ffffff;
+  border: 1px solid #d8e0e8;
+  border-radius: 0.8rem;
+  padding: 1rem;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+}
+
+.panel h2 {
+  margin-top: 0;
+}
+
+.day-controls {
+  margin-bottom: 1rem;
+}
+
+.day-control-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+textarea,
+input[type="date"],
+input[type="file"] {
+  width: 100%;
+  border: 1px solid #b8c5d1;
+  border-radius: 0.45rem;
+  padding: 0.5rem;
+  font: inherit;
+  margin: 0.35rem 0 0.75rem;
+}
+
+button {
+  border: 1px solid #365573;
+  background: #365573;
+  color: #fff;
+  padding: 0.45rem 0.8rem;
+  border-radius: 0.45rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+button:hover {
+  background: #28445f;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.action-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.status {
+  padding: 0.45rem 0.55rem;
+  border-radius: 0.45rem;
+  margin: 0.4rem 0;
+}
+
+.status.loading {
+  background: #e8f1fd;
+  color: #164269;
+}
+
+.status.error {
+  background: #fde8e8;
+  color: #8d1717;
+}
+
+.status.success {
+  background: #e7f8ee;
+  color: #205c36;
+}
+
+.status.warning {
+  background: #fff6df;
+  color: #775b13;
+}
+
+.status.empty {
+  background: #edf2f6;
+  color: #3d4d5f;
+}
+
+.draft-preview,
+.slot-block,
+.totals-block,
+.meal-card,
+.activity-card,
+.upload-card {
+  border: 1px solid #dce4eb;
+  border-radius: 0.6rem;
+  padding: 0.65rem;
+  margin-top: 0.65rem;
+}
+
+.warnings {
+  color: #8d1717;
+}
+
+.slot-empty {
+  color: #5b6978;
+}
+
+.edit-area textarea {
+  margin-bottom: 0.45rem;
+}
+
+a {
+  color: #214f7a;
+}
+
+@media (max-width: 700px) {
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .grid-layout {
+    grid-template-columns: 1fr;
+  }
+}
